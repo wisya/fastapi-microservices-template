@@ -1,46 +1,93 @@
-# FastAPI Backend Template
+# FastAPI Microservices Template
 
-This is a backend-only version of the [FastAPI Full Stack Template](https://github.com/fastapi/full-stack-fastapi-template), extracted to provide a pure REST API.
+Pembaruan arsitektur dari monolit menjadi **Microservices**. Proyek ini telah dipecah menjadi dua service independen yang dikelola melalui **Traefik** sebagai API Gateway.
 
-## Technology Stack and Features
+## Arsitektur Microservices
 
-- ⚡ [**FastAPI**](https://fastapi.tiangolo.com) for the Python backend API.
-  - 🧰 [SQLModel](https://sqlmodel.tiangolo.com) for the Python SQL database interactions (ORM).
-  - 🔍 [Pydantic](https://docs.pydantic.dev), used by FastAPI, for the data validation and settings management.
-  - 💾 [PostgreSQL](https://www.postgresql.org) as the SQL database.
-- 🐋 [Docker Compose](https://www.docker.com) for development and production.
-- 🔒 Secure password hashing by default.
-- 🔑 JWT (JSON Web Token) authentication.
-- 📫 Email based password recovery.
-- ✅ Tests with [Pytest](https://pytest.org).
-- 📞 [Traefik](https://traefik.io) as a reverse proxy / load balancer.
-- 🏭 CI (continuous integration) and CD (continuous deployment) based on GitHub Actions.
+Proyek ini terbagi menjadi dua service utama:
+- **`auth-service`**: Menangani registrasi, login, manajemen user, dan utilitas kesehatan sistem.
+- **`item-service`**: Menangani operasional CRUD untuk *Items* (barang/sumber daya).
 
-## How To Use It
+### Teknologi yang Digunakan:
+- **Backend**: FastAPI & SQLModel (Pydantic v2).
+- **Gateway**: Traefik (Reverse Proxy & Load Balancer).
+- **Database**: PostgreSQL (Shared Database Pattern).
+- **Package Management**: [uv](https://docs.astral.sh/uv/) (Sangat cepat).
 
-### Quick Start with Docker Compose
+---
 
-1. **Clone the repository** (if you haven't already).
-2. **Setup environment variables**:
-   Copy `.env` and adjust values if needed.
-3. **Run the stack**:
-   ```bash
-   docker compose up -d
-   ```
-4. **Access the API Documentation**:
-   Go to [http://localhost/docs](http://localhost/docs) (or [http://api.localhost](http://api.localhost) if using the Traefik setup).
+## Cara Menjalankan Service
 
-### Backend Development
+### 1. Persiapan Environment
+Pastikan Docker dan Docker Compose sudah terinstal. Salin file `.env` dan sesuaikan nilainya jika diperlukan (default sudah cukup untuk lokal).
 
-Detailed backend documentation can be found in [backend/README.md](./backend/README.md).
+### 2. Jalankan dengan Docker Compose
+Gunakan perintah berikut untuk membangun dan menjalankan seluruh service:
 
-## Project Structure
+```bash
+docker compose up -d --build
+```
 
-- `backend/`: FastAPI application code.
-- `scripts/`: Utility scripts for testing and pre-starting the app.
-- `compose.yml`: Docker Compose configuration for production-like environments.
-- `compose.override.yml`: Docker Compose configuration for local development.
+Service akan tersedia di:
+- **API Gateway**: [http://localhost:8081](http://localhost:8081)
+- **Auth Service Docs**: [http://api.localhost:8081/docs](http://api.localhost:8081/docs) (Host: `api.localhost`)
+- **Item Service Docs**: [http://api.localhost:8081/docs](http://api.localhost:8081/docs) (Terintegrasi via Traefik routing)
+- **Traefik Dashboard**: [http://localhost:8091](http://localhost:8091)
 
-## License
+---
 
-This project is licensed under the terms of the MIT license.
+## Contoh Eksekusi & Pengujian Endpoint
+
+Berikut adalah urutan pengujian lengkap menggunakan `curl`. Gunakan header `Host: api.localhost` karena Traefik melakukan routing berdasarkan domain tersebut.
+
+### A. Service Autentikasi (`auth-service`)
+
+**1. Registrasi User Baru**
+```bash
+curl -X POST -H "Host: api.localhost" -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "securepassword123", "full_name": "User Test"}' \
+  http://localhost:8081/api/v1/users/signup
+```
+
+**2. Login untuk Mendapatkan Token**
+```bash
+# Simpan token ke variabel agar mudah digunakan
+export TOKEN=$(curl -s -X POST -H "Host: api.localhost" \
+  -d "username=user@example.com&password=securepassword123" \
+  http://localhost:8081/api/v1/login/access-token | jq -r .access_token)
+
+echo "Token Anda: $TOKEN"
+```
+
+**3. Health Check Sistem**
+```bash
+curl -H "Host: api.localhost" http://localhost:8081/api/v1/utils/health-check/
+```
+
+### B. Service Barang (`item-service`)
+
+**1. Membuat Item Baru (Butuh Token)**
+```bash
+curl -X POST -H "Host: api.localhost" -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"title": "Laptop Gaming", "description": "High performance laptop"}' \
+  http://localhost:8081/api/v1/items/
+```
+
+**2. List Semua Item**
+```bash
+curl -H "Host: api.localhost" -H "Authorization: Bearer $TOKEN" \
+  http://localhost:8081/api/v1/items/
+```
+
+---
+
+## Struktur Proyek
+
+- `services/auth-service/`: Kode sumber service identitas dan auth.
+- `services/item-service/`: Kode sumber service manajemen barang.
+- `compose.yml`: Konfigurasi service untuk produksi.
+- `compose.override.yml`: Konfigurasi untuk pengembangan lokal (Hot Reloading).
+
+## Pengembangan Lokal
+Untuk fitur **Hot Reloading**, kami melakukan *volume mounting* pada folder `app/`. Setiap perubahan kode di direktori `services/*/app/` akan langsung memicu restart otomatis di dalam container tanpa perlu build ulang.
