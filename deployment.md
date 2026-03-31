@@ -339,6 +339,49 @@ Frontend: `https://dashboard.staging.fastapi-project.example.com`
 
 Backend API docs: `https://api.staging.fastapi-project.example.com/docs`
 
-Backend API base URL: `https://api.staging.fastapi-project.example.com`
 
-Adminer: `https://adminer.staging.fastapi-project.example.com`
+## Deployment to Kubernetes with Helm
+
+We provide a Helm Chart to orchestrate your microservices in a Kubernetes cluster. The chart is located in `charts/fastapi-app/`.
+
+### Prerequisites
+
+*   A running Kubernetes cluster (Minikube, K3s, GKE, EKS, etc.)
+*   [Helm](https://helm.sh/docs/intro/install/) installed on your local machine.
+*   An Ingress Controller (like Nginx or Traefik) installed in your cluster.
+
+### Deploying Services
+
+To deploy each service, use the specific `values-*.yaml` files provided:
+
+**1. Deploy Auth Service:**
+
+```bash
+helm upgrade --install auth-service ./charts/fastapi-app \
+  -f ./charts/fastapi-app/values.yaml \
+  -f ./charts/fastapi-app/values-auth.yaml \
+  --set secrets.SECRET_KEY="your-super-secret-key" \
+  --set secrets.POSTGRES_PASSWORD="your-db-password"
+```
+
+**2. Deploy Item Service:**
+
+```bash
+helm upgrade --install item-service ./charts/fastapi-app \
+  -f ./charts/fastapi-app/values.yaml \
+  -f ./charts/fastapi-app/values-items.yaml \
+  --set secrets.SECRET_KEY="your-super-secret-key" \
+  --set secrets.POSTGRES_PASSWORD="your-db-password"
+```
+
+### Common Commands
+
+*   **List Releases**: `helm list`
+*   **Check Pods**: `kubectl get pods`
+*   **Uninstall Service**: `helm uninstall auth-service`
+*   **Rollback**: `helm rollback auth-service 1`
+
+### Best Practices
+
+*   **Secrets Management**: In production, do not pass secrets via `--set`. Use a tool like **External Secrets Operator** or **Bitnami Sealed Secrets**.
+*   **Horizontal Pod Autoscaler (HPA)**: You can enable HPA in `values.yaml` to automatically scale your pods based on CPU/Memory usage.

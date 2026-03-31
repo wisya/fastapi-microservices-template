@@ -1,0 +1,19 @@
+# Values for Auth Service
+image:
+  repository: auth-service
+  tag: latest
+
+ingress:
+  hosts:
+    - host: api.localhost
+      paths:
+        - path: /api/v1/login
+          pathType: Prefix
+        - path: /api/v1/users
+          pathType: Prefix
+        - path: /api/v1/utils
+          pathType: Prefix
+
+env:
+  PROJECT_NAME: "Identity Service"
+  STACK_NAME: "auth-service"

@@ -1,0 +1,15 @@
+# Values for Item Service
+image:
+  repository: item-service
+  tag: latest
+
+ingress:
+  hosts:
+    - host: api.localhost
+      paths:
+        - path: /api/v1/items
+          pathType: Prefix
+
+env:
+  PROJECT_NAME: "Item Service"
+  STACK_NAME: "item-service"
