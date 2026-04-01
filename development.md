@@ -34,7 +34,7 @@ uv run bash scripts/tests-start.sh
 
 ### Tips Pengembangan:
 1.  **Shared Secret**: Pastikan `SECRET_KEY` di `.env` sama untuk semua service agar JWT bisa divalidasi silang secara lokal.
-2.  **Shared Database**: Untuk saat ini, kedua service berbagi satu database PostgreSQL. Pastikan skema tabel tetap terpisah secara logis.
+2.  **Database**: Service menggunakan database PostgreSQL.
 
 ---
 
@@ -64,7 +64,6 @@ uv run prek run --all-files
 
 Setiap service memiliki dokumentasi Swagger-nya sendiri, namun semuanya dapat diakses melalui Gateway:
 - **Auth Service Docs**: `http://api.localhost:8081/docs` (Routed from `/api/v1/login`, `/api/v1/users`, etc.)
-- **Item Service Docs**: `http://api.localhost:8081/docs` (Routed from `/api/v1/items`)
 
 > [!NOTE]
-> Karena Traefik melakukan routing berdasarkan PathPrefix, jika Anda membuka `/docs`, Anda mungkin melihat dokumentasi dari salah satu service tergantung pada aturan prioritas. Untuk melihat dokumentasi spesifik, Anda bisa mengakses port service secara langsung (misal: `:8001/docs` untuk auth, `:8002/docs` untuk items) jika port tersebut diekspos di `compose.override.yml`.
+> Karena Traefik melakukan routing berdasarkan PathPrefix, jika Anda membuka `/docs`, Anda mungkin melihat dokumentasi dari salah satu service tergantung pada aturan prioritas. Untuk melihat dokumentasi spesifik, Anda bisa mengakses port service secara langsung (misal: `:8001/docs` untuk auth) jika port tersebut diekspos di `compose.override.yml`.

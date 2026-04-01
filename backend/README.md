@@ -6,7 +6,6 @@ Seluruh kode utama, model, dan API yang sebelumnya berada di folder ini sekarang
 
 ### Struktur Baru:
 - **Identity & Auth**: [services/auth-service/](../services/auth-service/)
-- **Items Management**: [services/item-service/](../services/item-service/)
 
 Meskipun folder `backend/` ini masih dipertahankan untuk referensi migrasi sementara, **jangan melakukan pengembangan di folder ini lagi.** Gunakan folder `services/` untuk penambahan fitur baru.
 

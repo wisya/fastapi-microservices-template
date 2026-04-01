@@ -4,9 +4,8 @@ Selamat datang di template **FastAPI Microservices** yang fleksibel dan siap unt
 
 ## 🏗️ Arsitektur Sistem
 
-Sistem ini terdiri dari dua service inti yang berjalan secara independen:
+Sistem ini terdiri dari service inti:
 - **`auth-service`**: Pintu gerbang identitas (Registrasi, JWT Auth, User Management).
-- **`item-service`**: Pengelolaan data barang dengan skema basis data yang ter-decouple.
 - **`Traefik`**: Berperan sebagai API Gateway dan Ingress Controller.
 
 ## 🚀 Quick Start (Docker Compose)
@@ -41,9 +40,6 @@ curl -H "Host: api.localhost" http://localhost:8081/api/v1/utils/health-check/
 
 # 2. Login (Dapatkan Token)
 export TOKEN=$(curl -s -X POST -H "Host: api.localhost" -d "username=admin@example.com&password=changethis" http://localhost:8081/api/v1/login/access-token | jq -r .access_token)
-
-# 3. Create Item (Item Service)
-curl -X POST -H "Host: api.localhost" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"title": "Item Baru"}' http://localhost:8081/api/v1/items/
 ```
 
 ## 🛠️ Struktur Proyek
@@ -53,7 +49,6 @@ curl -X POST -H "Host: api.localhost" -H "Authorization: Bearer $TOKEN" -H "Cont
 ├── charts/             # Kubernetes Helm Charts
 ├── services/           # Folder Microservices
 │   ├── auth-service/   # Identity & Access Management
-│   └── item-service/   # Item Management
 ├── scripts/            # Utility & Automation Scripts
 ├── compose.yml         # Konfigurasi Production (Standard)
 └── compose.override.yml # Konfigurasi Development Lokal

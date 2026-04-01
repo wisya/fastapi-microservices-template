@@ -13,13 +13,5 @@ uv sync
 uv run bash scripts/tests-start.sh "Local Test - Auth Service"
 cd ../..
 
-# Item Service
-echo "--------------------------------------------------"
-echo "Testing Item Service..."
-cd services/item-service
-uv sync
-uv run bash scripts/tests-start.sh "Local Test - Item Service"
-cd ../..
-
 echo "--------------------------------------------------"
 echo "All tests passed!"

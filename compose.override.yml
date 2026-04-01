@@ -61,34 +61,6 @@ services:
     environment:
       EMAILS_FROM_EMAIL: "noreply@example.com"
 
-  item-service:
-    restart: "no"
-    ports:
-      - "8002:8000"
-    build:
-      context: ./services/item-service
-      dockerfile: Dockerfile
-    command:
-      - fastapi
-      - run
-      - --reload
-      - "app/main.py"
-    develop:
-      watch:
-        - path: ./services/item-service
-          action: sync
-          target: /app
-          ignore:
-            - ./services/item-service/.venv
-            - .venv
-        - path: ./services/item-service/pyproject.toml
-          action: rebuild
-    volumes:
-      - ./services/item-service/app:/app/app
-      - ./services/item-service/scripts:/app/scripts
-    environment:
-      EMAILS_FROM_EMAIL: "noreply@example.com"
-
 networks:
   traefik-public:
     external: false
