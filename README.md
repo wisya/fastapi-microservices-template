@@ -1,93 +1,61 @@
-# FastAPI Microservices Template
+# FastAPI Microservices Split (Docker Compose) 🚀
 
-Pembaruan arsitektur dari monolit menjadi **Microservices**. Proyek ini telah dipecah menjadi dua service independen yang dikelola melalui **Traefik** sebagai API Gateway.
+Template ini mendemonstrasikan cara memecah **FastAPI Monolith** menjadi **Microservices** yang independen dan ter-orkestrasi melalui Docker Compose.
 
-## Arsitektur Microservices
+## 🏗️ Arsitektur Sistem
 
-Proyek ini terbagi menjadi dua service utama:
-- **`auth-service`**: Menangani registrasi, login, manajemen user, dan utilitas kesehatan sistem.
-- **`item-service`**: Menangani operasional CRUD untuk *Items* (barang/sumber daya).
+Proyek ini telah dipecah menjadi dua service inti:
+- **`auth-service`**: Menangani Identitas, Login, dan User Management.
+- **`item-service`**: Menangani operasional CRUD untuk Barang (Items).
+- **`Traefik`**: Berfungsi sebagai API Gateway tunggal yang melakukan routing cerdas berdasarkan path URL.
 
-### Teknologi yang Digunakan:
-- **Backend**: FastAPI & SQLModel (Pydantic v2).
-- **Gateway**: Traefik (Reverse Proxy & Load Balancer).
-- **Database**: PostgreSQL (Shared Database Pattern).
-- **Package Management**: [uv](https://docs.astral.sh/uv/) (Sangat cepat).
+## 🚀 Cara Menjalankan Secara Lokal
 
----
-
-## Cara Menjalankan Service
-
-### 1. Persiapan Environment
-Pastikan Docker dan Docker Compose sudah terinstal. Salin file `.env` dan sesuaikan nilainya jika diperlukan (default sudah cukup untuk lokal).
-
-### 2. Jalankan dengan Docker Compose
-Gunakan perintah berikut untuk membangun dan menjalankan seluruh service:
+Pastikan Docker dan Docker Compose sudah terinstal di komputer Anda.
 
 ```bash
 docker compose up -d --build
 ```
-
-Service akan tersedia di:
-- **API Gateway**: [http://localhost:8081](http://localhost:8081)
-- **Auth Service Docs**: [http://api.localhost:8081/docs](http://api.localhost:8081/docs) (Host: `api.localhost`)
-- **Item Service Docs**: [http://api.localhost:8081/docs](http://api.localhost:8081/docs) (Terintegrasi via Traefik routing)
-- **Traefik Dashboard**: [http://localhost:8091](http://localhost:8091)
+Aplikasi akan tersedia di `http://api.localhost:8081`.
 
 ---
 
-## Contoh Eksekusi & Pengujian Endpoint
+## 📂 Panduan Dokumentasi
 
-Berikut adalah urutan pengujian lengkap menggunakan `curl`. Gunakan header `Host: api.localhost` karena Traefik melakukan routing berdasarkan domain tersebut.
+Pilih panduan pemeliharaan dan pengoperasian:
 
-### A. Service Autentikasi (`auth-service`)
+| Dokumen | Isi Utama |
+| :--- | :--- |
+| 🚢 [**Deployment**](./deployment.md) | Panduan mendeploy ke VPS menggunakan Docker Compose. |
+| 🛠️ [**Development**](./development.md) | Konfigurasi lokal, cara menambah fitur, dan unit testing. |
+| 🤝 [**Contributing**](./CONTRIBUTING.md) | Aturan berkontribusi dan standar penulisan kode microservices. |
 
-**1. Registrasi User Baru**
-```bash
-curl -X POST -H "Host: api.localhost" -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "securepassword123", "full_name": "User Test"}' \
-  http://localhost:8081/api/v1/users/signup
+---
+
+## 🛠️ Struktur Proyek
+
+```text
+.
+├── services/           # Folder Microservices
+│   ├── auth-service/   # Identity & Access Management
+│   └── item-service/   # Item Management
+├── scripts/            # Utility & Automation Scripts
+├── compose.yml         # Konfigurasi Production (Standard)
+└── compose.override.yml # Konfigurasi Development Lokal
 ```
 
-**2. Login untuk Mendapatkan Token**
-```bash
-# Simpan token ke variabel agar mudah digunakan
-export TOKEN=$(curl -s -X POST -H "Host: api.localhost" \
-  -d "username=user@example.com&password=securepassword123" \
-  http://localhost:8081/api/v1/login/access-token | jq -r .access_token)
+## 🧪 Verifikasi Cepat
 
-echo "Token Anda: $TOKEN"
-```
-
-**3. Health Check Sistem**
 ```bash
+# 1. Health Check (Identity Service)
 curl -H "Host: api.localhost" http://localhost:8081/api/v1/utils/health-check/
-```
 
-### B. Service Barang (`item-service`)
+# 2. Login (Dapatkan Token)
+export TOKEN=$(curl -s -X POST -H "Host: api.localhost" -d "username=admin@example.com&password=changethis" http://localhost:8081/api/v1/login/access-token | jq -r .access_token)
 
-**1. Membuat Item Baru (Butuh Token)**
-```bash
-curl -X POST -H "Host: api.localhost" -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{"title": "Laptop Gaming", "description": "High performance laptop"}' \
-  http://localhost:8081/api/v1/items/
-```
-
-**2. List Semua Item**
-```bash
-curl -H "Host: api.localhost" -H "Authorization: Bearer $TOKEN" \
-  http://localhost:8081/api/v1/items/
+# 3. Create Item (Item Service)
+curl -X POST -H "Host: api.localhost" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"title": "Item Baru"}' http://localhost:8081/api/v1/items/
 ```
 
 ---
-
-## Struktur Proyek
-
-- `services/auth-service/`: Kode sumber service identitas dan auth.
-- `services/item-service/`: Kode sumber service manajemen barang.
-- `compose.yml`: Konfigurasi service untuk produksi.
-- `compose.override.yml`: Konfigurasi untuk pengembangan lokal (Hot Reloading).
-
-## Pengembangan Lokal
-Untuk fitur **Hot Reloading**, kami melakukan *volume mounting* pada folder `app/`. Setiap perubahan kode di direktori `services/*/app/` akan langsung memicu restart otomatis di dalam container tanpa perlu build ulang.
+*Catatan: Jika Anda memerlukan orkestrasi Kubernetes, silakan cek branch `feat/kubernetes-helm`.*
