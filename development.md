@@ -14,7 +14,7 @@ docker compose up -d
 ### URL Lokal Penting:
 - **API Gateway (Traefik)**: `http://localhost:8081`
 - **Dashboard Traefik**: `http://localhost:8091`
-- **MailCatcher (Email Test)**: `http://localhost:1080`
+
 - **Postgres Database**: `localhost:5432`
 
 ---
@@ -62,9 +62,8 @@ uv run prek run --all-files
 
 ## 📜 5. Dokumentasi API (Swagger)
 
-Setiap service memiliki dokumentasi Swagger-nya sendiri, namun semuanya dapat diakses melalui Gateway:
-- **Auth Service Docs**: `http://api.localhost:8081/docs` (Routed from `/api/v1/login`, `/api/v1/users`, etc.)
-- **Item Service Docs**: `http://api.localhost:8081/docs` (Routed from `/api/v1/items`)
+- **Auth Service Docs**: [http://localhost:8001/docs](http://localhost:8001/docs)
+- **Item Service Docs**: [http://localhost:8002/docs](http://localhost:8002/docs)
 
 > [!NOTE]
-> Karena Traefik melakukan routing berdasarkan PathPrefix, jika Anda membuka `/docs`, Anda mungkin melihat dokumentasi dari salah satu service tergantung pada aturan prioritas. Untuk melihat dokumentasi spesifik, Anda bisa mengakses port service secara langsung (misal: `:8001/docs` untuk auth, `:8002/docs` untuk items) jika port tersebut diekspos di `compose.override.yml`.
+> Akses dokumentasi secara langsung melalui port service sangat disarankan selama pengembangan lokal untuk menghindari ambiguitas routing di API Gateway.

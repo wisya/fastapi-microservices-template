@@ -31,6 +31,6 @@ Saat mengirimkan PR:
 
 ## 💡 Diskusi Terlebih Dahulu
 
-Untuk **perubahan besar** (menambah service baru, mengubah arsitektur gateway), harap buka [GitHub Discussion](https://github.com/fastapi/full-stack-fastapi-template/discussions) terlebih dahulu.
+Untuk **perubahan besar** (menambah service baru, mengubah arsitektur gateway), harap buka [GitHub Discussion](../../discussions) terlebih dahulu.
 
 Terima kasih telah membangun masa depan microservices bersama kami! 🙇
